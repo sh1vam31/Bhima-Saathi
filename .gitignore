@@ -1,0 +1,10 @@
+# Environments
+.venv/
+__pycache__/
+*.pyc
+
+# DB
+*.db
+
+# Secrets
+.env

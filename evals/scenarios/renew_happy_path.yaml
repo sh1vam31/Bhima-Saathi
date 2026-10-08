@@ -1,0 +1,16 @@
+id: renew_hinglish_happy_path
+language: hinglish
+tags: [renewal, payment, hinglish]
+mock_tools:
+  get_policy: '{"status": "success", "data": {"policy_no": "POL123456", "expiry_date": "2026-11-15", "premium": 11200}, "error_code": null, "request_id": "req_1", "latency_ms": 100}'
+  get_renewal_quote: '{"status": "success", "data": {"quote_id": "Q1", "total": 12450}, "error_code": null, "request_id": "req_2", "latency_ms": 100}'
+  create_payment_link: '{"status": "success", "data": {"payment_link_id": "plink_1", "url": "https://rzp.io/i/x"}, "error_code": null, "request_id": "req_3", "latency_ms": 100}'
+turns:
+  - user: "bhai meri car insurance kab expire hogi?"
+    expect: {"no_tool_call": true, "reply_asks_for": "policy_number", "reply_style": "hinglish"}
+  - user: "POL123456"
+    expect: {"tools": ["get_policy"], "reply_contains_date": "15 Nov 2026"}
+  - user: "renew kar do"
+    expect: {"tools_in_order": ["get_renewal_quote"], "reply_contains_amount": 12450}
+  - user: "haan"
+    expect: {"tools": ["create_payment_link"], "hallucinated_action": false}
