@@ -28,7 +28,7 @@ class OpenAIClient(LLMClient):
                 api_key=settings.GROQ_API_KEY or settings.LLM_API_KEY,
                 base_url="https://api.groq.com/openai/v1"
             )
-            self.model = "llama3-70b-8192" # or mixtral-8x7b-32768
+            self.model = "qwen/qwen3.8-27b" # Updated to an actively supported model in the Groq registry
         else:
             self.client = openai.AsyncOpenAI(api_key=settings.LLM_API_KEY)
             self.model = "gpt-4o-mini"
@@ -47,8 +47,7 @@ class OpenAIClient(LLMClient):
             openai_tools = [{"type": "function", "function": t} for t in tools]
             kwargs["tools"] = openai_tools
             
-        # Groq's structured output parsing via json_object
-        kwargs["response_format"] = {"type": "json_object"}
+        # Removed response_format as Qwen models on Groq can struggle when mixing tools and json_object
             
         response = await self.client.chat.completions.create(**kwargs)
         

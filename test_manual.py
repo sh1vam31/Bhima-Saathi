@@ -90,6 +90,4 @@ async def run_manual_test():
     db.close()
 
 if __name__ == "__main__":
-    if not os.environ.get("LLM_API_KEY"):
-        print("WARNING: LLM_API_KEY is not set. The LLM calls will fail.")
     asyncio.run(run_manual_test())

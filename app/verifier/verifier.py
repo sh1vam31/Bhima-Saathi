@@ -3,8 +3,9 @@ import re
 from typing import Literal, List, Dict, Any, Optional
 from pydantic import BaseModel
 from app.verifier.claims import ClaimType, EVIDENCE, scan_text_for_claims
-from app.llm.orchestrator import Draft, ClaimedAction # Assuming we'll create this later
-
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from app.llm.orchestrator import Draft, ClaimedAction
 class ToolCallRecord(BaseModel):
     id: str
     tool: str
@@ -41,7 +42,7 @@ def values_match(text: str, response_json: str, field: str) -> bool:
         return True
 
 class ActionVerifier:
-    def verify(self, draft: Draft, tool_log: List[ToolCallRecord]) -> VerifierResult:
+    def verify(self, draft: 'Draft', tool_log: List[ToolCallRecord]) -> VerifierResult:
         violations = []
         
         # 1. Collect declared claims

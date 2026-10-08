@@ -122,11 +122,31 @@ class Orchestrator:
             # Fallback if too many iterations
             return TurnResult(final_text="I need to check that. Please wait.", state_updates={})
             
+        state_updates = {}
+        # Simple state machine transition based on successful tools this turn
+        successful_tools = [rec.tool for rec in tool_log_records if rec.status == "success"]
+        
+        if "get_policy" in successful_tools:
+            conv.state = "POLICY_VERIFIED"
+            state_updates["state"] = "POLICY_VERIFIED"
+        if "get_renewal_quote" in successful_tools:
+            conv.state = "QUOTE_SHOWN"
+            state_updates["state"] = "QUOTE_SHOWN"
+        if "create_payment_link" in successful_tools:
+            conv.state = "AWAIT_PAYMENT"
+            state_updates["state"] = "AWAIT_PAYMENT"
+        if "raise_claim" in successful_tools:
+            conv.state = "CLAIM_RAISED"
+            state_updates["state"] = "CLAIM_RAISED"
+        if "handoff_to_human" in successful_tools:
+            conv.state = "HANDOFF"
+            state_updates["state"] = "HANDOFF"
+            
         # Run Action Verifier
         for attempt in range(2):
             verdict = self.verifier.verify(draft, tool_log_records)
             if verdict.decision == "pass":
-                return TurnResult(final_text=draft.reply_text, state_updates={})
+                return TurnResult(final_text=draft.reply_text, state_updates=state_updates)
                 
             if attempt == 0:
                 # Regenerate
